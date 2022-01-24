@@ -36,14 +36,12 @@ typedef struct ARGUMENT {
 
 int argparse(ARGUMENT *args, int argc, char *argv[])
 {
-        int i, j, k, f, n;
-        n = 0;
+        int i, j, k, f, n = 0;
         while (args->n) {
                 args->v = args->d, args->s = args->i = args->e = 0;
                 args++, n++;
         }
-        args -= n;
-        for (i = 1; i < argc; i++) {
+        for (i = 1, args -= n; i < argc; i++) {
                 k = 0, f = 0;
                 for (j = 0; j < n; j++) {
                         if (!strcmp(argv[i], args[j].n) ||
