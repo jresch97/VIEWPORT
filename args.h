@@ -82,18 +82,18 @@ void argerr(ARGUMENT *args, char *argv[], int e)
                         argv[e], e);
         }
         else {
-                e = args[e - 1].e;
-                if (e == ARGDUPL) {
+                e = e - 1;
+                if (args[e].e == ARGDUPL) {
                         fprintf(stderr,
                                 "duplicate arg %s (%s) at argv[%d]\n",
                                 args[e].n, args[e].a, args[e].i);
                 }
-                else if (e == ARGMISSV) {
+                else if (args[e].e == ARGMISSV) {
                         fprintf(stderr,
                                 "no value for arg %s (%s) at argv[%d]\n",
                                 args[e].n, args[e].a, args[e].i);
                 }
-                else if (e == ARGMISS) {
+                else if (args[e].e == ARGMISS) {
                         fprintf(stderr,
                                 "required arg %s (%s) missing\n",
                                 args[e].n, args[e].a);
