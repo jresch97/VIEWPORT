@@ -34,10 +34,10 @@ typedef struct ARGUMENT {
         int         s,  i,  e;
 } ARGUMENT;
 
-int argparse(ARGUMENT *args, int argc, char *argv[], int *e)
+int argparse(ARGUMENT *args, int argc, char *argv[])
 {
         int i, j, k, f, n;
-        n = 0, *e = 0;
+        n = 0;
         while (args->n) {
                 args->v = args->d, args->s = args->i = args->e = 0;
                 args++, n++;
@@ -50,32 +50,28 @@ int argparse(ARGUMENT *args, int argc, char *argv[], int *e)
                             !strcmp(argv[i], args[j].a)) {
                                 if (args[j].i > 0) {
                                         args[j].i = i, args[j].e = ARGDUPL;
-                                        *e = j;
-                                        return 0;
+                                        return j + 1;
                                 }
-                                else if (k == 0) {
-                                        args[j].i = i, k = j, f = 1;
-                                }
+                                else if (k == 0) args[j].i = i, k = j, f = 1;
                         }
                 }
                 if (!f) {
-                        *e = -i;
-                        return 0;
+                        return -i;
                 }
                 else if (args[k].f) args[k].s = 1;
                 else if (++i >= argc || argv[i][0] == '-') {
-                        args[k].e = ARGMISSV, *e = k;
-                        return 0;
+                        args[k].e = ARGMISSV;
+                        return k + 1;
                 }
                 else args[k].v = argv[i];
         }
         for (i = 0; i < n; i++) {
                 if (args[i].r && args[i].i == 0) {
-                        args[i].e = ARGMISS, *e = i;
-                        return 0;
+                        args[i].e = ARGMISS;
+                        return i + 1;
                 }
         }
-        return 1;
+        return 0;
 }
 
 void argerr(ARGUMENT *args, char *argv[], int e)
@@ -85,17 +81,23 @@ void argerr(ARGUMENT *args, char *argv[], int e)
                 fprintf(stderr, "unknown arg %s at argv[%d]\n",
                         argv[e], e);
         }
-        else if (args[e].e == ARGDUPL) {
-                fprintf(stderr, "duplicate arg %s (%s) at argv[%d]\n",
-                        args[e].n, args[e].a, args[e].i);
-        }
-        else if (args[e].e == ARGMISSV) {
-                fprintf(stderr, "no value for arg %s (%s) at argv[%d]\n",
-                        args[e].n, args[e].a, args[e].i);
-        }
-        else if (args[e].e == ARGMISS) {
-                fprintf(stderr, "required arg %s (%s) missing\n",
-                        args[e].n, args[e].a);
+        else {
+                e = args[e + 1].e;
+                if (e == ARGDUPL) {
+                        fprintf(stderr,
+                                "duplicate arg %s (%s) at argv[%d]\n",
+                                args[e].n, args[e].a, args[e].i);
+                }
+                else if (e == ARGMISSV) {
+                        fprintf(stderr,
+                                "no value for arg %s (%s) at argv[%d]\n",
+                                args[e].n, args[e].a, args[e].i);
+                }
+                else if (e == ARGMISS) {
+                        fprintf(stderr,
+                                "required arg %s (%s) missing\n",
+                                args[e].n, args[e].a);
+                }
         }
 }
 

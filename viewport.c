@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         int         e;
         const char *vp;
         const char *fp;
-        if (!argparse(args, argc, argv, &e)) {
+        if ((e = argparse(args, argc, argv)) != 0) {
                 argerr(args, argv, e);
                 arghelp(args);
                 return EXIT_FAILURE;
