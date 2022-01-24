@@ -22,6 +22,9 @@
 #ifndef VIEWPORT_ARGS_H
 #define VIEWPORT_ARGS_H
 
+#include <stdio.h>
+#include <string.h>
+
 enum ARGERRS { ARGDUPL, ARGMISS, ARGMISSV };
 
 typedef struct ARGUMENT {
@@ -33,53 +36,42 @@ typedef struct ARGUMENT {
 
 int argparse(ARGUMENT *args, int argc, char *argv[], int *e)
 {
-	ARGUMENT *arg;
-        int       n, i, j, f;
-        arg = args;
-        while (arg->n) {
-                arg->i = -1;
-                arg->v = arg->d;
-                arg->s = arg->e = 0;
-                arg++;
-                n++;
+        int i, j, k, f, n;
+        n = 0, *e = 0;
+        while (args->n) {
+                args->v = args->d, args->s = args->i = args->e = 0;
+                args++, n++;
         }
+        args -= n;
         for (i = 1; i < argc; i++) {
-                for (j = 0, f = 0; j < n; j++) {
-                        if (strcmp(argv[i], args[j].n) == 0 ||
-                            strcmp(argv[i], args[j].a) == 0) {
+                k = 0, f = 0;
+                for (j = 0; j < n; j++) {
+                        if (!strcmp(argv[i], args[j].n) ||
+                            !strcmp(argv[i], args[j].a)) {
                                 if (args[j].i > 0) {
-                                        args[j].i = i;
-                                        args[j].e = ARGDUPL;
+                                        args[j].i = i, args[j].e = ARGDUPL;
                                         *e = j;
                                         return 0;
                                 }
-                                args[j].i = i;
-                                if (args[j].f) {
-                                        args[j].s = 1;
-                                        f = 1;
-                                        break;
+                                else if (k == 0) {
+                                        args[j].i = i, k = j, f = 1;
                                 }
-                                i++;
-                                if ((i < argc && argv[i][0] == '-') ||
-                                    i >= argc) {
-                                        args[j].e = ARGMISSV;
-                                        *e = j;
-                                        return 0;
-                                }
-                                else args[j].v = argv[i];
-                                f = 1;
-                                break;
                         }
                 }
                 if (!f) {
                         *e = -i;
                         return 0;
                 }
+                else if (args[k].f) args[k].s = 1;
+                else if (++i >= argc || argv[i][0] == '-') {
+                        args[k].e = ARGMISSV, *e = k;
+                        return 0;
+                }
+                else args[k].v = argv[i];
         }
         for (i = 0; i < n; i++) {
-                if (args[i].r && args[i].i < 0) {
-                        args[i].e = ARGMISS;
-                        *e = i;
+                if (args[i].r && args[i].i == 0) {
+                        args[i].e = ARGMISS, *e = i;
                         return 0;
                 }
         }
@@ -109,11 +101,11 @@ void argerr(ARGUMENT *args, char *argv[], int e)
 
 void arghelp(ARGUMENT *args)
 {
-        ARGUMENT *arg;
-        arg = args;
-        while ((arg = args++)->n) {
+        while (args->n) {
                 printf("%s%s (%s) - %s\n",
-                        arg->r ? "* " : "  ", arg->n, arg->a, arg->u);
+                        args->r ? "* " : "  ",
+                        args->n, args->a, args->u);
+                args++;
         }
 }
 
