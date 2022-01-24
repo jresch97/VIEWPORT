@@ -82,7 +82,7 @@ void argerr(ARGUMENT *args, char *argv[], int e)
                         argv[e], e);
         }
         else {
-                e = args[e + 1].e;
+                e = args[e - 1].e;
                 if (e == ARGDUPL) {
                         fprintf(stderr,
                                 "duplicate arg %s (%s) at argv[%d]\n",
