@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2021 Jared B. Resch
+ * Copyright (C) 2022 Jared B. Resch
  *
  * This file is part of VIEWPORT.
  * 
