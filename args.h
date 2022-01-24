@@ -55,9 +55,7 @@ int argparse(ARGUMENT *args, int argc, char *argv[])
                                 else if (k == 0) args[j].i = i, k = j, f = 1;
                         }
                 }
-                if (!f) {
-                        return -i;
-                }
+                if (!f) return -i;
                 else if (args[k].f) args[k].s = 1;
                 else if (++i >= argc || argv[i][0] == '-') {
                         args[k].e = ARGMISSV;
